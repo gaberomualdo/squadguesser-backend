@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://xtrp:IveBeenSilentForTooLong@cluster-0.7i7z1.mongodb.net/SquadGuessr?retryWrites=true&w=majority",
+  "jwtToken": "mysecrettoken"
+}

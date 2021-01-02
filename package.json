@@ -1,0 +1,36 @@
+{
+  "name": "squadguessr-server",
+  "version": "1.0.0",
+  "description": "Server side of xtrp/squadguessr, uses Node, Express, and MongoDB",
+  "main": "server.js",
+  "repository": "https://github.com/xtrp/squadguessr-server",
+  "author": "xtrp <36894883+xtrp@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsdom": "^16.4.0",
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.6",
+    "seedrandom": "^3.0.5",
+    "url-join": "^4.0.1",
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.1",
+    "express-validator": "^6.4.0",
+    "gravatar": "^1.8.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.6",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "concurrently": "^5.1.0",
+    "nodemon": "^2.0.2"
+  },
+  "scripts": {
+    "make_clubs": "node routes/api/squad_data/make_club_squads.js",
+    "make_urls": "node routes/api/squad_data/make_squads_url_list.js",
+    "dev": "nodemon index",
+    "start": "node index"
+  }
+}
