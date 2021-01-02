@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({
         errors: [
           {
-            msg: 'User already exists',
+            msg: 'Username is taken',
           },
         ],
       });
@@ -97,6 +97,28 @@ router.delete('/me', auth, async (req, res) => {
     res.json({
       msg: 'User deleted',
     });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+router.post('/usernameavailable', async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    // See if user exists, send error if so
+    let user = await User.findOne({ username });
+
+    if (user) {
+      return res.json({
+        available: false,
+      });
+    } else {
+      return res.json({
+        available: true,
+      });
+    }
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

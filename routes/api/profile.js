@@ -97,7 +97,6 @@ router.get('/user/:user_id', async (req, res) => {
 // @access  Private
 router.put('/me/game', auth, async (req, res) => {
   const { type, league, correctAnswer, won, hintsUsed, wrongGuesses } = req.body;
-
   const newGamePlayed = { type, league, correctAnswer, won, hintsUsed, wrongGuesses };
 
   try {

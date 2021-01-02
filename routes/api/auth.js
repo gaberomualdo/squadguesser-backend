@@ -19,7 +19,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// @route   POST api/users
+// @route   POST api/auth
 // @desc    Authenticate user and get token
 // @access  Public
 router.post('/', async (req, res) => {
@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({
         errors: [
           {
-            msg: 'Invalid Credentials',
+            msg: 'Invalid Username or Password',
           },
         ],
       });
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({
         errors: [
           {
-            msg: 'Invalid Credentials',
+            msg: 'Invalid Username or Password',
           },
         ],
       });
@@ -67,6 +67,16 @@ router.post('/', async (req, res) => {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
+});
+
+// @route   GET api/auth/checktoken
+// @desc    Check if given JWT token is working and valid!
+// @access  private
+router.get('/checktoken', auth, async (req, res) => {
+  // got past the auth middleware, so it worked!
+  res.json({
+    msg: 'Token is valid',
+  });
 });
 
 module.exports = router;

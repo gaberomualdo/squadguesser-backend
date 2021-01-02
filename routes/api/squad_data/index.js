@@ -96,6 +96,19 @@ router.get('/teams/by-league/:league', (req, res) => {
 router.get('/teams/by-league/onlynames/:league', (req, res) => {
   res.json(reduceToTeamName(getTeamsByLeague(req.params.league)));
 });
+
+router.get('/teams/by-league/onlylogos/:league', (req, res) => {
+  res.json(getTeamsByLeague(req.params.league).map((e) => e.logoURL));
+});
+
+router.get('/teams/by-league/onlynamesandlogos/:league', (req, res) => {
+  res.json(
+    getTeamsByLeague(req.params.league).map((e) => {
+      return { logoURL: e.logoURL, name: e.name };
+    })
+  );
+});
+
 router.get('/teams/all/by-league/', (req, res) => {
   const fullData = {};
   getListOfLeagues().forEach((l) => {
