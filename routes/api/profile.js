@@ -3,7 +3,16 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 
-const formatProfile = async (e) => e.populate('user', ['username']).select('rating gamesPlayed');
+const formatProfile = async (e) => e.populate('user', ['-password']).select('rating gamesPlayed');
+
+const getProfileLeaderboardPos = async (userId) => {
+  const profiles = await formatProfile(Profile.find().sort('-rating'));
+  for (let i = 0; i < profiles.length; i++) {
+    if (profiles[i].toObject().user._id == userId) {
+      return i + 1;
+    }
+  }
+};
 
 // @route   GET api/profile/me
 // @desc    Get current user's profile
@@ -20,7 +29,8 @@ router.get('/me', auth, async (req, res) => {
         ],
       });
     }
-    res.json(profile);
+    const leaderboardPos = await getProfileLeaderboardPos(req.user.id);
+    res.json({ ...profile.toObject(), leaderboardPosition: leaderboardPos });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
@@ -64,8 +74,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// @route   GET api/profile
-// @desc    Get all profiles
+// @route   GET top/:count
+// @desc    Get top 'count' profiles
 // @access  Public
 router.get('/top/:count', async (req, res) => {
   try {
