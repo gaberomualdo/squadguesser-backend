@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 
-const formatProfile = async (e) => e.populate('user', ['-password']).select('rating gamesPlayed');
+const formatProfile = async (e) => e.populate('user', ['-password']).select('rating gamesPlayed ratingHistory');
 
 const getProfileLeaderboardPos = async (userId) => {
   const profiles = await formatProfile(Profile.find().sort('-rating'));
@@ -65,6 +65,7 @@ router.get('/me/rating', auth, async (req, res) => {
 // @desc    Get all profiles
 // @access  Public
 router.get('/', async (req, res) => {
+  return; // this is not yet useful so better to just remove it.
   try {
     const profiles = await formatProfile(Profile.find());
     res.json(profiles);
@@ -79,7 +80,13 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/top/:count', async (req, res) => {
   try {
-    const profiles = await formatProfile(Profile.find().sort('-rating').limit(parseInt(req.params.count)));
+    let profiles = await formatProfile(Profile.find().sort('-rating').limit(parseInt(req.params.count)));
+    profiles = profiles.map((e, i) => {
+      let r = e.toObject();
+      r.gamesPlayedCount = r.gamesPlayed.length;
+      delete r.gamesPlayed;
+      return r;
+    });
     res.json(profiles);
   } catch (err) {
     console.error(err.message);
@@ -109,9 +116,31 @@ router.put('/me/game', auth, async (req, res) => {
   const { type, league, correctAnswer, won, hintsUsed, wrongGuesses } = req.body;
   const newGamePlayed = { type, league, correctAnswer, won, hintsUsed, wrongGuesses };
 
+  // decide whether to increase or decrease rating
+  const wrongAndHintsLimit = 3;
+  const ratingMultiplier = won
+    ? wrongGuesses + hintsUsed < wrongAndHintsLimit
+      ? 1 / (wrongGuesses + hintsUsed + 1)
+      : -0.4 * (wrongAndHintsLimit + 1 - wrongGuesses + hintsUsed)
+    : -1;
+
   try {
     const profile = await Profile.findOne({ user: req.user.id });
     profile.gamesPlayed.unshift(newGamePlayed);
+
+    if (profile.ratingHistory.length === 0) {
+      profile.ratingHistory.push({
+        rating: profile.rating,
+      });
+    }
+
+    const ratingChange = Math.min((62 / (profile.rating / 400)) * ratingMultiplier, 150);
+    profile.rating = Math.max(Math.ceil(profile.rating + ratingChange), 100);
+
+    profile.ratingHistory.push({
+      rating: profile.rating,
+    });
+
     await profile.save();
     res.json(profile);
   } catch (err) {

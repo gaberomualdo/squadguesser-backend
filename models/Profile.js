@@ -10,6 +10,19 @@ const ProfileSchema = new mongoose.Schema({
     type: Number,
     default: 1000,
   },
+  ratingHistory: [
+    {
+      rating: {
+        type: Number,
+        required: true,
+      },
+      date: {
+        type: Date,
+        required: true,
+        default: Date.now,
+      },
+    },
+  ],
   gamesPlayed: [
     {
       type: {

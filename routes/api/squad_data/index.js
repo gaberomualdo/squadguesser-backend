@@ -18,10 +18,15 @@ const chooseRandomFromArr = (arr) => {
   return arr[Math.floor(Math.random() * arr.length)];
 };
 
+const avgRatings = (x) => Object.values(x).reduce((a, b) => a + b, 0) / Object.keys(x).length;
 const getTopTeams = (cutOff = 50) => {
-  const avg = (x) => Object.values(x).reduce((a, b) => a + b, 0) / Object.keys(x).length;
   const teams = getAllTeams();
-  teams.sort((a, b) => avg(a.fifaMiscData.ratings) - avg(b.fifaMiscData.ratings)).reverse();
+  teams.sort((a, b) => avgRatings(a.fifaMiscData.ratings) - avgRatings(b.fifaMiscData.ratings)).reverse();
+  return teams.slice(0, cutOff);
+};
+const getWorstTeams = (cutOff = 50) => {
+  const teams = getAllTeams();
+  teams.sort((a, b) => avgRatings(a.fifaMiscData.ratings) - avgRatings(b.fifaMiscData.ratings));
   return teams.slice(0, cutOff);
 };
 
@@ -55,6 +60,14 @@ const additionalLeagues = [
   {
     name: 'Top 25 Teams',
     teams: () => getTopTeams(25),
+  },
+  {
+    name: 'Top 40 Teams',
+    teams: () => getTopTeams(50),
+  },
+  {
+    name: 'Worst 25 Teams',
+    teams: () => getWorstTeams(25),
   },
 ];
 const excludedLeaguesFromDatabase = ['All Teams'];
@@ -107,6 +120,14 @@ router.get('/teams/by-league/onlynamesandlogos/:league', (req, res) => {
       return { logoURL: e.logoURL, name: e.name };
     })
   );
+});
+router.get('/stats', (req, res) => {
+  const teamsCount = getAllTeams().length;
+  res.json({
+    leaguesCount: Object.keys(data).length + additionalLeagues.length,
+    teamsCount,
+    playersCount: teamsCount * 11,
+  });
 });
 
 router.get('/teams/all/by-league/', (req, res) => {
