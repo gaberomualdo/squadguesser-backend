@@ -113,11 +113,11 @@ router.get('/user/:user_id', async (req, res) => {
 // @desc    Add profile game
 // @access  Private
 router.put('/me/game', auth, async (req, res) => {
-  const { type, league, correctAnswer, won, hintsUsed, wrongGuesses } = req.body;
-  const newGamePlayed = { type, league, correctAnswer, won, hintsUsed, wrongGuesses };
+  const { type, league, correctAnswer, won, hintsUsed, wrongGuesses, correctAnswerRating } = req.body;
+  const newGamePlayed = { type, league, correctAnswer, won, hintsUsed, wrongGuesses, correctAnswerRating };
 
   // decide whether to increase or decrease rating
-  const wrongAndHintsLimit = 3;
+  const wrongAndHintsLimit = 5;
   const ratingMultiplier = won
     ? wrongGuesses + hintsUsed < wrongAndHintsLimit
       ? 1 / (wrongGuesses + hintsUsed + 1)
@@ -134,7 +134,20 @@ router.put('/me/game', auth, async (req, res) => {
       });
     }
 
-    const ratingChange = Math.min((62 / (profile.rating / 400)) * ratingMultiplier, 150);
+    // some great math equations
+    function f(x) {
+      return 62 / (x / 400);
+    }
+    function g(x) {
+      return -(62 / ((x - 2500) / 400));
+    }
+
+    let ratingChange;
+    if (ratingMultiplier > 0) {
+      ratingChange = Math.min(f(profile.rating) * ratingMultiplier, 150);
+    } else {
+      ratingChange = Math.min(g(profile.rating) * ratingMultiplier, 150);
+    }
     profile.rating = Math.max(Math.ceil(profile.rating + ratingChange), 100);
 
     profile.ratingHistory.push({

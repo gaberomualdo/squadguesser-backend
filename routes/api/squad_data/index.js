@@ -30,21 +30,9 @@ const getWorstTeams = (cutOff = 50) => {
   return teams.slice(0, cutOff);
 };
 
-const getCurrentDateStr = (swapMonthAndDay = false) => {
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2, '0');
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const yyyy = today.getFullYear();
-  if (swapMonthAndDay) {
-    return `${dd}/${mm}/${yyyy}`;
-  } else {
-    return `${mm}/${dd}/${yyyy}`;
-  }
-};
 const getDailyChallengeTeams = () => {
   const leagues = Object.keys(data);
-  const randomGenerator = seedrandom(getCurrentDateStr());
-  return Object.values(data)[Math.floor(randomGenerator() * leagues.length)];
+  return getTopTeams(20);
 };
 
 const additionalLeagues = [
@@ -65,10 +53,6 @@ const additionalLeagues = [
     name: 'Top 40 Teams',
     teams: () => getTopTeams(50),
   },
-  {
-    name: 'Worst 25 Teams',
-    teams: () => getWorstTeams(25),
-  },
 ];
 const excludedLeaguesFromDatabase = ['All Teams'];
 
@@ -88,11 +72,28 @@ const getListOfLeagues = () => {
     .concat(Object.keys(data));
 };
 
-router.get('/dailychallenge/team', (req, res) => {
+router.get('/dailychallenge/:date/team', (req, res) => {
   const teams = getDailyChallengeTeams();
-  const randomGenerator = seedrandom(getCurrentDateStr(true));
+  const randomGenerator = seedrandom(req.params.date);
   const team = teams[Math.floor(randomGenerator() * teams.length)];
   res.json(team);
+});
+router.get('/dailychallenge/:date/formationtypes', (req, res) => {
+  const randomGenerator = seedrandom(req.params.date);
+  // generate gamemode
+  const enabledGameTypes = [];
+  for (let i = 0; i < 5; i++) {
+    if (Math.floor(randomGenerator() * 2) === 0) {
+      // choose whether the gametype is enabled or not
+      enabledGameTypes.push(i);
+    }
+  }
+  // generate formation
+  const formation = [];
+  for (let k = 0; k < 11; k++) {
+    formation.push(enabledGameTypes[Math.floor(randomGenerator() * enabledGameTypes.length)]);
+  }
+  res.json(formation);
 });
 
 router.get('/leagues', (req, res) => {
@@ -127,6 +128,7 @@ router.get('/stats', (req, res) => {
     leaguesCount: Object.keys(data).length + additionalLeagues.length,
     teamsCount,
     playersCount: teamsCount * 11,
+    gameTypesCount: 4,
   });
 });
 
@@ -136,6 +138,16 @@ router.get('/teams/all/by-league/', (req, res) => {
     if (excludedLeaguesFromDatabase.indexOf(l) === -1) {
       fullData[l] = getTeamsByLeague(l);
     }
+  });
+  res.json(fullData);
+});
+
+router.get('/teams/all/by-league/onlynamesandlogos', (req, res) => {
+  const fullData = {};
+  getListOfLeagues().forEach((l) => {
+    fullData[l] = getTeamsByLeague(l).map((e) => {
+      return { logoURL: e.logoURL, name: e.name };
+    });
   });
   res.json(fullData);
 });

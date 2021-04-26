@@ -8,27 +8,66 @@ const auth = require('../../middleware/auth');
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
 
+const validatePasswordAndGetError = async (password) => {
+  let error;
+  let bounds = [8, 20];
+  if (!(password.length >= bounds[0] && password.length <= bounds[1])) {
+    valid = false;
+    error = `Password must be between ${bounds.join('-')} characters.`;
+  }
+  return error;
+};
+
+const validateUsernameAndGetError = async (username, signingUp) => {
+  let error;
+  try {
+    // See if user exists, send error if so
+    let user = await User.findOne({ username });
+    if (user && signingUp) {
+      error = 'Username not available.';
+    } else if (!user && !signingUp) {
+      error = 'User with username does not exist.';
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '1234567890';
+  let bounds = [4, 20];
+  if (!(username.length >= bounds[0] && username.length <= bounds[1])) {
+    error = `Username must be between ${bounds.join('-')} characters.`;
+  } else if (alphabet.indexOf(username[0]) === -1) {
+    error = 'Username must start with a letter.';
+  } else {
+    const invalidChars = [...new Set(username.split('').filter((e) => (alphabet + numbers + '_').indexOf(e) === -1))];
+    if (invalidChars.length > 0) {
+      error = `Username cannot include: ${invalidChars.map((e) => `'${e}'`).join(', ')}.`;
+    }
+  }
+  return error;
+};
+
 // @route   POST api/users
 // @desc    register user
 // @access  Public
 router.post('/', async (req, res) => {
   const { password, username } = req.body;
 
+  const error = (await validateUsernameAndGetError(username, true)) || (await validatePasswordAndGetError(password));
+  if (error) {
+    return res.status(400).json({
+      errors: [
+        {
+          msg: error,
+        },
+      ],
+    });
+  }
+
   try {
-    // See if user exists, send error if so
-    let user = await User.findOne({ username });
-
-    if (user) {
-      return res.status(400).json({
-        errors: [
-          {
-            msg: 'Username is taken',
-          },
-        ],
-      });
-    }
-
-    user = new User({
+    let user = new User({
       username,
       password,
     });
@@ -56,21 +95,12 @@ router.post('/', async (req, res) => {
 
     jwt.sign(payload, config.get('jwtToken'), {}, (err, token) => {
       if (err) throw err;
-      res.json({ token, msg: 'User created' });
+      res.json({ token, msg: 'User created successfully.' });
     });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
-});
-
-// @route  GET api/users
-// @desc   get all users
-// @access public
-router.get('/', async (req, res) => {
-  // show username and date
-  let users = await User.find().select('username date');
-  res.json(users);
 });
 
 // @route   GET api/users/me
@@ -103,25 +133,23 @@ router.delete('/me', auth, async (req, res) => {
   }
 });
 
-router.post('/usernameavailable', async (req, res) => {
-  const { username } = req.body;
+router.post('/validateusername', async (req, res) => {
+  const { username, signingUp } = req.body;
 
-  try {
-    // See if user exists, send error if so
-    let user = await User.findOne({ username });
+  const error = await validateUsernameAndGetError(username, signingUp);
 
-    if (user) {
-      return res.json({
-        available: false,
-      });
-    } else {
-      return res.json({
-        available: true,
-      });
-    }
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+  if (error) {
+    res.status(400).json({
+      errors: [
+        {
+          msg: error,
+        },
+      ],
+    });
+  } else {
+    res.status(200).json({
+      msg: 'Username is valid.',
+    });
   }
 });
 

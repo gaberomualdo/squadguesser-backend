@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({
         errors: [
           {
-            msg: 'Invalid Username or Password',
+            msg: 'Invalid username or password.',
           },
         ],
       });
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({
         errors: [
           {
-            msg: 'Invalid Username or Password',
+            msg: 'Invalid username or password.',
           },
         ],
       });

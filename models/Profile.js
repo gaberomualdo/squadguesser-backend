@@ -50,6 +50,9 @@ const ProfileSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
+      correctAnswerRating: {
+        type: Number,
+      },
       date: {
         type: Date,
         required: true,
