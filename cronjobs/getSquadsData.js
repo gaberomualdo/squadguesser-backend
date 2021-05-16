@@ -1,14 +1,9 @@
-const fs = require('fs');
 const fetch = require('node-fetch');
 const { JSDOM } = require('jsdom');
 const { makeURL } = require('./utils');
-const dataJSONPath = require('./utils').getDataJSONPath();
+const cliProgress = require('cli-progress');
 
-const SQUADS_URL_LIST_FILEPATH = `${dataJSONPath}/squads_url_list.json`;
-
-try {
-  const squadsURLs = JSON.parse(fs.readFileSync(SQUADS_URL_LIST_FILEPATH).toString());
-
+const makeClubSquads = (squadsURLs, callback) => {
   let allSquadData = {};
 
   const squadTypes = Object.keys(squadsURLs);
@@ -18,12 +13,14 @@ try {
     .map((e) => e.length)
     .reduce((a, b) => a + b, 0);
 
+  const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+  progressBar.start(total, 0);
+
   Object.values(squadsURLs).forEach((urls, idx) => {
     const typeName = squadTypes[idx];
     allSquadData[typeName] = [];
 
     setTimeout(() => {
-      console.log('Scraping new league!');
       urls.forEach((url, urlIdx) => {
         setTimeout(async () => {
           let squadData = {};
@@ -116,7 +113,7 @@ try {
               if (playerData.name && playerData.url && playerData.age && playerData.kitNumber) {
                 squadData.players.push(playerData);
               } else {
-                console.log('Error with team ' + squadData.name);
+                console.error('Error with team ' + squadData.name);
               }
             });
           })();
@@ -167,18 +164,14 @@ try {
           allSquadData[typeName].push(squadData);
 
           done++;
-          console.log(`Finished Team ${squadData.name}`);
-          console.log(`Done ${done}/${total}`);
+          progressBar.update(done);
           if (done === total) {
-            try {
-              fs.renameSync(`${dataJSONPath}/club_squads.json`, `${dataJSONPath}/old/club_squads-${new Date().getTime()}.json`);
-            } catch (err) {}
-            fs.writeFileSync(`${dataJSONPath}/club_squads.json`, JSON.stringify(allSquadData));
+            progressBar.stop();
+            callback(allSquadData);
           }
         }, urlIdx * 200);
       });
     }, idx * 6000);
   });
-} catch (err) {
-  console.error(`Problem reading (JSON from) file ${SQUADS_URL_LIST_FILEPATH}`);
-}
+};
+module.exports = makeClubSquads;

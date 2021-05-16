@@ -5,8 +5,4 @@ const makeURL = (urlPath) => {
   return urljoin(SQUADS_SITE_BASE_URL, urlPath);
 };
 
-const getDataJSONPath = () => {
-  return 'routes/api/squad_data/data_json';
-};
-
-module.exports = { makeURL, getDataJSONPath };
+module.exports = { makeURL };

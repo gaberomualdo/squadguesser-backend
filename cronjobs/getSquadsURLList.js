@@ -1,8 +1,7 @@
 const { makeURL } = require('./utils');
 const fetch = require('node-fetch');
 const { JSDOM } = require('jsdom');
-const fs = require('fs');
-const dataJSONPath = require('./utils').getDataJSONPath();
+const cliProgress = require('cli-progress');
 
 const getSquadsFromURL = async (squadURL) => {
   let curPageSquads = [];
@@ -33,7 +32,7 @@ const getSquadsFromURL = async (squadURL) => {
   return curPageSquads;
 };
 
-(async () => {
+const makeSquadsURLList = async (callback) => {
   const squadLeagues = [13, 53, 19, 31, 16, 10, 308, 68, 1003, 50, 14];
   const squadLeaguesNames = [
     'Premier League',
@@ -56,6 +55,9 @@ const getSquadsFromURL = async (squadURL) => {
     .split(',')
     .map((e) => e !== 'false');
 
+  const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+  progressBar.start(squadLeagues.length, 0);
+
   for (let i = 0; i < squadLeagues.length; i++) {
     const leagueId = squadLeagues[i];
     squads[squadLeaguesNames[i]] = [];
@@ -66,11 +68,12 @@ const getSquadsFromURL = async (squadURL) => {
         const pageSquads = await getSquadsFromURL(makeURL(`/teams/${page}/?league=${leagueId}`));
         if (pageSquads.length > 0) {
           squads[squadLeaguesNames[i]] = squads[squadLeaguesNames[i]].concat(pageSquads.map((e) => makeURL(e)));
-          console.log(`${leagueId}: ${squads[squadLeaguesNames[i]].length} squads done`);
         } else {
           finishedSquadLeagues[i] = true;
+          progressBar.update(finishedSquadLeagues.filter((e) => e !== false).length);
           if (finishedSquadLeagues.filter((e) => e === false).length === 0) {
-            fs.writeFileSync(`${dataJSONPath}/squads_url_list.json`, JSON.stringify(squads, null, 2));
+            progressBar.stop();
+            callback(squads);
           }
           break;
         }
@@ -78,4 +81,6 @@ const getSquadsFromURL = async (squadURL) => {
       }
     }, 0);
   }
-})();
+};
+
+module.exports = makeSquadsURLList;
