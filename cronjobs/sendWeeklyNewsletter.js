@@ -1,8 +1,9 @@
 const fs = require('fs');
+const path = require('path');
 const config = require('config');
-const stftime = require('stftime');
+const strftime = require('strftime');
 const Mustache = require('mustache');
-const getEmailUnsubscribeToken = require('./getEmailUnsubscribeToken');
+const getEmailUnsubscribeToken = require('../lib/getEmailUnsubscribeToken');
 const sendEmail = require('../lib/sendEmail');
 const EmailSubscriber = require('../models/EmailSubscriber');
 const baseURL = config.get('frontendBaseURL');
@@ -13,16 +14,16 @@ const getDayURL = (daysBefore) => {
   return `${baseURL}/daily/${getDateStr(getDateDaysBeforeToday(daysBefore))}`;
 };
 
-const sendWeeklyNewsletter = () => {
-  const emailSubscribers = EmailSubscriber.find();
-  const emailTemplateHTML = fs.readFileSync('../emailTemplates/weeklyChallenges.html');
-  const emailTemplateText = fs.readFileSync('../emailTemplates/weeklyChallenges.txt');
+const sendWeeklyNewsletter = async () => {
+  const emailSubscribers = await EmailSubscriber.find({});
+  const emailTemplateHTML = fs.readFileSync(path.join(__dirname, '../emailTemplates/weeklyNewsletter.html')).toString();
+  const emailTemplateText = fs.readFileSync(path.join(__dirname, '../emailTemplates/weeklyNewsletter.txt')).toString();
 
   const defaultOpts = {
     logoLightURL: `${baseURL}/email-assets/logo-light.png`,
     logoURL: `${baseURL}/email-assets/logo.png`,
     appName,
-    dateExpression: stftime('%A, %B %e, %Y'),
+    dateExpression: strftime('%A, %B %e, %Y'),
 
     saturdayURL: getDayURL(7),
     sundayURL: getDayURL(6),
@@ -37,7 +38,9 @@ const sendWeeklyNewsletter = () => {
     termsURL: `${baseURL}/terms`,
   };
 
-  emailSubscribers.forEach((emailSubscriber) => {
+  for (let i = 0; i < emailSubscribers.length; i++) {
+    const emailSubscriber = emailSubscribers[i];
+    console.log(emailSubscriber);
     const { emailAddress } = emailSubscriber;
     const opts = {
       ...defaultOpts,
@@ -48,6 +51,6 @@ const sendWeeklyNewsletter = () => {
     const emailTextContent = Mustache.render(emailTemplateText, opts);
 
     sendEmail(emailAddress, `This Week's ${appName} Games For You`, emailTextContent, emailHTMLContent);
-  });
+  }
 };
 module.exports = sendWeeklyNewsletter;
