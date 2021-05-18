@@ -1,0 +1,7 @@
+Hello, world! The API is running.
+
+This app was built by Gabriel Romualdo.
+  His personal site is xtrp.io and you can view some social links of his at gabrielromualdo.com.
+  He may be contacted at xtrp@xtrp.io and gabriel@gabrielromualdo.com.
+
+Thanks for checking out the API!
