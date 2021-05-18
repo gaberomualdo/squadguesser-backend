@@ -1,4 +1,10 @@
 {
   "mongoURI": "mongodb+srv://xtrp:IveBeenSilentForTooLong@cluster-0.7i7z1.mongodb.net/SquadGuessr?retryWrites=true&w=majority",
-  "jwtToken": "mysecrettoken"
+  "jwtToken": "mysecrettoken",
+  "frontendBaseURL": "http://localhost:3000",
+  "appName": "SquadGuesser",
+  "botEmailAddress": "bot@gabrielromualdo.com",
+  "botEmailDisplayName": "SquadGuesser",
+  "botEmailPassword": "goodthingsfallapart12960",
+  "botEmailHost": "smtp.dreamhost.com"
 }

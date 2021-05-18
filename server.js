@@ -6,6 +6,7 @@ const path = require('path');
 const cron = require('node-cron');
 const getSquadsURLs = require('./cronjobs/getSquadsURLList');
 const getClubSquads = require('./cronjobs/getSquadsData');
+const sendWeeklyNewsletter = require('./cronjobs/sendWeeklyNewsletter');
 
 const SquadsDataStore = require('./models/SquadsDataStore');
 
@@ -39,8 +40,7 @@ app.use('/api/auth', require('./routes/api/auth.js'));
 app.use('/api/email-list', require('./routes/api/emailList.js'));
 app.use('/', require('./routes/api/squadData/'));
 
-// start cronjobs
-
+// initialize cronjobs
 const updateSquadsJob = async () => {
   console.log('Started fetching squads data.');
   getSquadsURLs((squadsURLs) => {
@@ -65,12 +65,11 @@ const updateSquadsJob = async () => {
     });
   });
 };
-// scheduled every day at 4:55 AM local time
+// every day at 4:55 AM UTC (presuming server is UTC)
 cron.schedule('55 10 * * *', () => updateSquadsJob());
-setTimeout(() => {
-  // run just after the server starts as well
-  // updateSquadsJob();
-}, 3000);
+
+// every Saturday at 8:30 AM UTC (presuming server is UTC)
+cron.schedule('30 8 * * 6', () => sendWeeklyNewsletter());
 
 // start app
 const PORT = process.env.PORT || 6773;

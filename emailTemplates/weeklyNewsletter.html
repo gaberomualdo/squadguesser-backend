@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+      img {
+        margin: 0 auto;
+        margin-bottom: 8px;
+        display: block;
+        height: auto;
+      }
+      .container {
+        margin: 0 auto;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        font-size: 18px;
+      }
+      .container > * {
+        padding: 2rem;
+      }
+      a {
+        color: #2188ff;
+        text-decoration: none;
+      }
+      header {
+        background-color: #27ae60;
+        color: #fff;
+      }
+      header img {
+        width: 250px;
+      }
+      header,
+      footer {
+        text-align: center;
+      }
+      footer {
+        background-color: #233140;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #bbb;
+      }
+      footer .links {
+        margin-bottom: 8px;
+      }
+      footer img {
+        width: 175px;
+      }
+      main {
+        background-color: #2c3e50;
+      }
+      main h2,
+      main h3 {
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.05rem;
+        line-height: 1.4;
+      }
+      main h2 {
+        font-size: 30px;
+        color: #fff;
+      }
+      main h3 {
+        font-size: 18px;
+        font-weight: 300;
+        color: #bbb;
+      }
+      main .links {
+        margin: 24px 0;
+        text-align: center;
+      }
+      main .links a {
+        box-sizing: border-box;
+        text-align: left;
+        display: inline-block;
+        padding: 12px 16px;
+        background-color: #27ae60;
+        color: #fff;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 250px;
+      }
+      main .links a:not(:last-child) {
+        margin-bottom: 10px;
+      }
+      main .links a span:last-child {
+        float: right;
+      }
+      main p {
+        font-size: 16px;
+        color: #fff;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <img src="{{ logoLightURL }}" alt="{{ appName }}" />
+        <p>Test your knowledge of the beautiful game.</p>
+      </header>
+      <main>
+        <h2>This week's games</h2>
+        <h3>Week of {{ dateExpression }}</h3>
+        <div class="links">
+          <a href="{{ saturdayURL }}"><span>Saturday's Game</span><span>&rarr;</span></a>
+          <a href="{{ sundayURL }}"><span>Sunday's Game</span><span>&rarr;</span></a>
+          <a href="{{ mondayURL }}"><span>Monday's Game</span><span>&rarr;</span></a>
+          <a href="{{ tuesdayURL }}"><span>Tuesday's Game</span><span>&rarr;</span></a>
+          <a href="{{ wednesdayURL }}"><span>Wednesday's Game</span><span>&rarr;</span></a>
+          <a href="{{ thursdayURL }}"><span>Thursday's Game</span><span>&rarr;</span></a>
+          <a href="{{ yesterdayURL }}"><span>Friday's Game</span><span>&rarr;</span></a>
+        </div>
+        <p>We hope you enjoy playing this week's challenges.</p>
+      </main>
+      <footer>
+        <img src="{{ logoURL }}" alt="{{ appName }}" />
+        <div class="links">
+          <a href="{{ aboutURL }}">About</a>
+          &nbsp;&bull;&nbsp;
+          <a href="{{ teamURL }}">Our Team</a>
+          &nbsp;&bull;&nbsp;
+          <a href="{{ termsURL }}">Terms</a>
+          <br />
+          <p><a href="{{ unsubscribeURL }}">Unsubscribe From This List</a></p>
+        </div>
+        <p>This email was sent to {{ emailAddress }}.</p>
+        <p>Emails like this are sent every Saturday.</p>
+      </footer>
+    </div>
+  </body>
+</html>

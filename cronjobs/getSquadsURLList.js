@@ -1,4 +1,4 @@
-const { makeURL } = require('./utils');
+const { makeURL } = require('../lib/utils');
 const fetch = require('node-fetch');
 const { JSDOM } = require('jsdom');
 const cliProgress = require('cli-progress');

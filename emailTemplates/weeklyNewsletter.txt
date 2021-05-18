@@ -1,0 +1,22 @@
+{{ appName }}
+Test your knowledge of the beautiful game.
+
+Games from the week of {{ dateExpression }}:
+
+Saturday's Game: {{ saturdayURL }}
+Sunday's Game: {{ sundayURL }}
+Monday's Game: {{ mondayURL }}
+Tuesday's Game: {{ tuesdayURL }}
+Wednesday's Game: {{ wednesdayURL }}
+Thursday's Game: {{ thursdayURL }}
+Friday's Game: {{ yesterdayURL }}
+
+We hope you enjoy playing this week's challenges.
+
+About: {{ aboutURL }}
+Our Team: {{ teamURL }}
+Terms: {{ termsURL }}
+Unsubscribe From This List: {{ unsubscribeURL }}
+
+This email was sent to {{ emailAddress }}.
+Emails like this are sent every Saturday.

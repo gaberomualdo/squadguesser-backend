@@ -4,7 +4,6 @@ const router = express.Router();
 const emailValidator = require('email-validator');
 const jwt = require('jsonwebtoken');
 const EmailSubscriber = require('../../models/EmailSubscriber');
-const { response } = require('express');
 
 router.put('/subscribe', async (req, res) => {
   try {
@@ -15,7 +14,6 @@ router.put('/subscribe', async (req, res) => {
         message: 'Missing email address.',
       });
     }
-    console.log(emailAddress);
     if (!emailValidator.validate(emailAddress)) {
       return res.status(400).json({
         message: 'Invalid email address.',

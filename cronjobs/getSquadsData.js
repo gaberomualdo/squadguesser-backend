@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const { JSDOM } = require('jsdom');
-const { makeURL } = require('./utils');
+const { makeURL } = require('../lib/utils');
 const cliProgress = require('cli-progress');
 
 const makeClubSquads = (squadsURLs, callback) => {

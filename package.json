@@ -22,10 +22,13 @@
     "jsdom": "^16.4.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.6",
+    "mustache": "^4.2.0",
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1",
+    "nodemailer": "^6.6.0",
     "request": "^2.88.2",
     "seedrandom": "^3.0.5",
+    "strftime": "^0.10.0",
     "url-join": "^4.0.1"
   },
   "devDependencies": {
